@@ -1,0 +1,24 @@
+==== Just 
+---- It should wrap a plain value. 
+.
+---- It should be used for further computation 
+..
+
+==== Maybe 
+---- It should obey the monad laws: return a >>= f === f a 
+.
+---- It should obey the monad laws: m >>= return === m 
+.
+---- It should obey the monad laws: (m >>= f) >>= g === m >>= (\x -> f x >>= g) 
+.
+
+==== Nothing 
+---- It should ignore further computation. 
+....
+
+
+
+**** Result ****
+
+
+10 examples, 0 failures

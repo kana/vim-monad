@@ -1,0 +1,106 @@
+" Maybe implementation  "{{{1
+
+let s:Maybe = monad#create_type_constructor('Maybe')
+function! s:Maybe.__bind__(cont)
+  if self is s:Nothing
+    return s:Nothing
+  else
+    return a:cont.inue(self.value)
+  endif
+endfunction
+
+let s:Nothing = s:Maybe.return({'identity': 'Nothing'})
+
+function! Just(a)
+  return s:Maybe.return(a:a)
+endfunction
+
+
+
+
+" Misc.  "{{{1
+
+function! Lookup(key, db)
+  if has_key(a:db, a:key)
+    return Just(a:db[a:key])
+  else
+    return s:Nothing
+  endif
+endfunction
+
+
+
+
+function s:describe__Just()  "{{{1
+  It should wrap a plain value.
+
+  let something = []
+  Should Just(something).value is something
+
+  It should be used for further computation
+
+  let db = {
+  \   'kana1': {
+  \     'arpeggio': {
+  \       'github': 'https://github.com/kana/vim-arpeggio',
+  \     },
+  \   },
+  \ }
+  Should Just(db).bind('Lookup', 'kana1').value is db.kana1
+  Should Just(db).bind('Lookup', 'kana1').bind('Lookup', 'arpeggio').value
+  \      is db.kana1.arpeggio
+endfunction
+
+
+
+
+function s:describe__Maybe()  "{{{1
+  let Maybe = s:Maybe
+  let db = {'key1': {'key2': 'value'}}
+
+  It should obey the monad laws: return a >>= f === f a
+
+  Should Maybe.return(db).bind('Lookup', 'key1') ==# Lookup('key1', db)
+
+  It should obey the monad laws: m >>= return === m
+
+  let m = Just(db)
+  Should m.bind('Just') ==# m
+
+  It should obey the monad laws: (m >>= f) >>= g === m >>= (\x -> f x >>= g)
+
+  let m = Just(db)
+  function! F(x)
+    return Lookup('key1', a:x)
+  endfunction
+  function! G(x)
+    return Lookup('key2', a:x)
+  endfunction
+  function! L(x)
+    return F(a:x).bind('G')
+  endfunction
+  Should (m.bind('F')).bind('G') ==# m.bind('L')
+endfunction
+
+
+
+
+function s:describe__Nothing()  "{{{1
+  let Nothing = s:Nothing
+
+  It should ignore further computation.
+
+  Should Nothing.bind('has') is Nothing
+  Should Nothing.bind('min').bind('max') is Nothing
+
+  let db = {'1': {}}
+  Should Just(db).bind('Lookup', 'something') is Nothing
+  Should Just(db).bind('Lookup', '1').bind('Lookup', '2').bind('Lookup', '3')
+  \      is Nothing
+endfunction
+
+
+
+
+" __END__  "{{{1
+" vim: filetype=vim foldmethod=marker
