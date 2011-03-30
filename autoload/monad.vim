@@ -25,7 +25,27 @@
 
 let s:prototype = {}
 
-function! s:prototype.bind(a_to_m_b)
+function! s:prototype.bind(a_to_m_b, ...)
+  let cont = {}
+
+  if type(a:a_to_m_b) == type(function('function'))
+    let cont.a_to_m_b = a:a_to_m_b
+  else  " type(a:a_to_m_b) == type('')
+    let cont.a_to_m_b = function(a:a_to_m_b)
+  endif
+
+  let cont.partial_arguments = a:000
+
+  let cont.inue = function('monad#_bind')
+
+  return self.__bind__(cont)
+endfunction
+
+function! monad#_bind(a) dict
+  return call(self.a_to_m_b, self.partial_arguments + [a:a])
+endfunction
+
+function! s:prototype.__bind__(a_to_m_b)
   throw 'bind operator is not defined for type: ' . self.type.name
 endfunction
 
