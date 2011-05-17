@@ -25,6 +25,19 @@
 
 let s:prototype = {}
 
+function! s:prototype.make(name)
+  return extend(
+  \   {
+  \     'type': {
+  \       'base': self,
+  \       'name': a:name,
+  \     },
+  \   },
+  \   self,
+  \   'keep'
+  \ )
+endfunction
+
 function! s:prototype.bind(a_to_m_b, ...)
   let cont = {}
 
@@ -59,7 +72,7 @@ endfunction
 " Public  "{{{1
 
 function! monad#create_type_constructor(name)
-  return extend({'type': {'name': a:name}}, s:prototype, 'keep')
+  return s:prototype.make(a:name)
 endfunction
 
 
