@@ -45,7 +45,7 @@ function! monad#_bind(a) dict
   return call(self.a_to_m_b, self.partial_arguments + [a:a])
 endfunction
 
-function! s:prototype.__bind__(a_to_m_b)
+function! s:prototype.__bind__(cont)
   throw 'bind operator is not defined for type: ' . self.type.name
 endfunction
 
