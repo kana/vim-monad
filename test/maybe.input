@@ -2,14 +2,17 @@
 
 let s:Maybe = monad#create_type_constructor('Maybe')
 function! s:Maybe.__bind__(cont)
-  if self is s:Nothing
-    return s:Nothing
+  if self is Nothing()
+    return Nothing()
   else
     return a:cont.inue(self.value)
   endif
 endfunction
 
 let s:Nothing = s:Maybe.return({'identity': 'Nothing'})
+function! Nothing()
+  return s:Nothing
+endfunction
 
 function! Just(a)
   return s:Maybe.return(a:a)
@@ -24,7 +27,7 @@ function! Lookup(key, db)
   if has_key(a:db, a:key)
     return Just(a:db[a:key])
   else
-    return s:Nothing
+    return Nothing()
   endif
 endfunction
 
@@ -86,17 +89,15 @@ endfunction
 
 
 function s:describe__Nothing()  "{{{1
-  let Nothing = s:Nothing
-
   It should ignore further computation.
 
-  Should Nothing.bind('has') is Nothing
-  Should Nothing.bind('min').bind('max') is Nothing
+  Should Nothing().bind('has') is Nothing()
+  Should Nothing().bind('min').bind('max') is Nothing()
 
   let db = {'1': {}}
-  Should Just(db).bind('Lookup', 'something') is Nothing
+  Should Just(db).bind('Lookup', 'something') is Nothing()
   Should Just(db).bind('Lookup', '1').bind('Lookup', '2').bind('Lookup', '3')
-  \      is Nothing
+  \      is Nothing()
 endfunction
 
 
