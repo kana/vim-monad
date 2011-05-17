@@ -14,8 +14,9 @@ function! Nothing()
   return s:TheNothingValue
 endfunction
 
+let s:Just = s:Maybe.make('Just')
 function! Just(a)
-  return s:Maybe.return(a:a)
+  return s:Just.return(a:a)
 endfunction
 
 
