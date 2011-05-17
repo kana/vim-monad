@@ -9,9 +9,9 @@ function! s:Maybe.__bind__(cont)
   endif
 endfunction
 
-let s:Nothing = s:Maybe.return({'identity': 'Nothing'})
+let s:TheNothingValue = s:Maybe.make('Nothing').return({'identity': 'Nothing'})
 function! Nothing()
-  return s:Nothing
+  return s:TheNothingValue
 endfunction
 
 function! Just(a)
